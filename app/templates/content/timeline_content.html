@@ -1,0 +1,222 @@
+<div class="section-content">
+    <div class="timeline-container">
+        <!-- Post Creation Form -->
+        <div class="timeline-form-container">
+            <h2><i class="fa-solid fa-plus-circle"></i> Share Something</h2>
+            <form id="timeline-form" class="timeline-form">
+                <div class="form-group">
+                    <label for="name"><i class="fa-solid fa-user"></i> Name</label>
+                    <input type="text" id="name" name="name" required placeholder="Your name...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email"><i class="fa-solid fa-envelope"></i> Email</label>
+                    <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="content"><i class="fa-solid fa-comment"></i> What's on your mind?</label>
+                    <textarea id="content" name="content" required placeholder="Share your thoughts, experiences, or updates..." rows="4"></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <i class="fa-solid fa-paper-plane"></i> Post to Timeline
+                </button>
+            </form>
+        </div>
+
+        <!-- Timeline Posts Display -->
+        <div class="timeline-posts-container">
+            <h2><i class="fa-solid fa-timeline"></i> Recent Posts</h2>
+            <div id="timeline-posts" class="timeline-posts">
+                <div class="loading-timeline">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Loading posts...
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Actions -->
+        <div class="admin-actions">
+            <h3><i class="fa-solid fa-tools"></i> Admin Actions</h3>
+            <button id="delete-latest-btn" class="delete-btn">
+                <i class="fa-solid fa-trash"></i> Delete Latest Post
+            </button>
+            <button id="refresh-timeline-btn" class="refresh-btn">
+                <i class="fa-solid fa-refresh"></i> Refresh Timeline
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Timeline functionality - this will run when timeline content is loaded
+(function() {
+    const timelineForm = document.getElementById('timeline-form');
+    const timelinePostsContainer = document.getElementById('timeline-posts');
+    const deleteLatestBtn = document.getElementById('delete-latest-btn');
+    const refreshTimelineBtn = document.getElementById('refresh-timeline-btn');
+
+    // Load timeline posts on page load
+    loadTimelinePosts();
+
+    // Handle form submission
+    timelineForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(timelineForm);
+        const submitBtn = timelineForm.querySelector('.submit-btn');
+        
+        // Disable submit button and show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posting...';
+        
+        fetch('/api/timeline_post', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Reset form
+            timelineForm.reset();
+            
+            // Show success message
+            showMessage('Post created successfully!', 'success');
+            
+            // Reload timeline posts
+            loadTimelinePosts();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error creating post. Please try again.', 'error');
+        })
+        .finally(() => {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Post to Timeline';
+        });
+    });
+
+    // Handle delete latest post
+    deleteLatestBtn.addEventListener('click', function() {
+        if (!confirm('Are you sure you want to delete the latest post?')) {
+            return;
+        }
+        
+        const deleteBtn = this;
+        deleteBtn.disabled = true;
+        deleteBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting...';
+        
+        fetch('/api/timeline_post', {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            showMessage(data.message || 'Post deleted successfully!', 'success');
+            loadTimelinePosts();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error deleting post. Please try again.', 'error');
+        })
+        .finally(() => {
+            deleteBtn.disabled = false;
+            deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Delete Latest Post';
+        });
+    });
+
+    // Handle refresh timeline
+    refreshTimelineBtn.addEventListener('click', function() {
+        loadTimelinePosts();
+        showMessage('Timeline refreshed!', 'success');
+    });
+
+    // Function to load timeline posts
+    function loadTimelinePosts() {
+        timelinePostsContainer.innerHTML = '<div class="loading-timeline"><i class="fa-solid fa-spinner fa-spin"></i> Loading posts...</div>';
+        
+        fetch('/api/timeline_post')
+        .then(response => response.json())
+        .then(data => {
+            displayTimelinePosts(data.timeline_posts);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            timelinePostsContainer.innerHTML = '<div class="error-timeline"><i class="fa-solid fa-exclamation-triangle"></i> Error loading posts. Please try again.</div>';
+        });
+    }
+
+    // Function to display timeline posts
+    function displayTimelinePosts(posts) {
+        if (!posts || posts.length === 0) {
+            timelinePostsContainer.innerHTML = '<div class="no-posts"><i class="fa-solid fa-clock"></i> No posts yet. Be the first to share something!</div>';
+            return;
+        }
+
+        let postsHTML = '';
+        posts.forEach((post, index) => {
+            const date = new Date(post.created_at);
+            const formattedDate = date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            postsHTML += `
+                <div class="timeline-post" data-post-id="${post.id}">
+                    <div class="timeline-post-header">
+                        <div class="post-author">
+                            <i class="fa-solid fa-user-circle"></i>
+                            <span class="author-name">${escapeHtml(post.name)}</span>
+                        </div>
+                        <div class="post-date">
+                            <i class="fa-solid fa-clock"></i>
+                            <span>${formattedDate}</span>
+                        </div>
+                    </div>
+                    <div class="timeline-post-content">
+                        <p>${escapeHtml(post.content).replace(/\n/g, '<br>')}</p>
+                    </div>
+                    <div class="timeline-post-footer">
+                        <span class="post-email">
+                            <i class="fa-solid fa-envelope"></i>
+                            ${escapeHtml(post.email)}
+                        </span>
+                    </div>
+                </div>
+            `;
+        });
+
+        timelinePostsContainer.innerHTML = postsHTML;
+    }
+
+    // Function to show messages
+    function showMessage(message, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message message-${type}`;
+        messageDiv.innerHTML = `
+            <i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(messageDiv);
+        
+        // Animate in
+        setTimeout(() => messageDiv.classList.add('show'), 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            messageDiv.classList.remove('show');
+            setTimeout(() => messageDiv.remove(), 300);
+        }, 3000);
+    }
+
+    // Function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+})();
+</script> 

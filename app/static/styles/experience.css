@@ -7,6 +7,8 @@
     margin-left: auto;
     margin-right: auto;
     padding: 0 20px;
+    align-items: start;
+    grid-auto-columns: 1fr;
 }
 
 .person-timeline {
@@ -15,13 +17,18 @@
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     border: 1px solid #e0e0e0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .person-header {
     display: flex;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
     border-bottom: 2px solid #f0f0f0;
 }
 
@@ -44,6 +51,8 @@
 
 .person-info {
     flex-grow: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .person-name {
@@ -51,6 +60,8 @@
     font-weight: 700;
     color: #333;
     margin-bottom: 5px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .person-role {
@@ -58,10 +69,16 @@
     font-weight: 600;
     color: #1c539f;
     margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .timeline-entries {
     position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .timeline-entry {
@@ -89,10 +106,16 @@
 .timeline-content {
     background: #f8f9fa;
     padding: 20px;
-    margin-top: 1em;
-    margin-bottom: 1em;
+    margin-bottom: 15px;
     border-left: 4px solid #1c539f;
+    border-radius: 8px;
     transition: all 0.3s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .timeline-content:hover {
@@ -100,11 +123,20 @@
     transform: translateX(5px);
 }
 
+.timeline-content:last-child {
+    margin-bottom: 0;
+}
+
+
+
 .timeline-content .position-title {
     font-size: 18px;
     font-weight: 700;
     color: #333;
     margin-bottom: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .timeline-content .company-name {
@@ -112,6 +144,9 @@
     font-weight: 600;
     color: #1c539f;
     margin-bottom: 5px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .timeline-content .duration {
@@ -126,6 +161,9 @@
     line-height: 1.6;
     margin: 0;
     text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 /* Media Queries for mobile */
@@ -139,11 +177,15 @@
     
     .person-timeline {
         padding: 20px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
     
     .person-header {
-        margin-bottom: 20px;
-        padding-bottom: 15px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
     }
     
     .person-avatar {

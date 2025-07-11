@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from peewee import *
+from peewee import fn
 import datetime
 from playhouse.shortcuts import model_to_dict
 
@@ -84,6 +85,10 @@ def hobbies():
 def travel():
     return handle_route('travel', 'content/travel_content.html', 'Travel')
 
+@app.route('/timeline')
+def timeline():
+    return handle_route('timeline', 'content/timeline_content.html', 'Timeline')
+
 
 @app.route('/api/timeline_post', methods=['POST'])
 def post_time_line_post():
@@ -106,7 +111,6 @@ TimelinePost.select().order_by(TimelinePost.created_at.desc())
 
 @app.route('/api/timeline_post', methods=['DELETE'])
 def delete_time_line_post():
-    # Find the maximum ID in the table
     max_id_query = TimelinePost.select(fn.MAX(TimelinePost.id)).scalar()
     
     if max_id_query is None:
