@@ -3,16 +3,18 @@
 API_URL="http://localhost:5000/api/timeline_post"
 
 # MySQL/MariaDB Credentials
+# Probably dont put db info into a public repo/prod, export instead
 USER="myportfolio"
 PASSWORD="mypassword"
 DATABASE="myportfoliodb"
 
-
+# List of names, fetches a random one
 generate_random_name() {
     local names=("Ryan" "Alice" "Bob" "Charlie" "Diana" "Frank")
     echo "${names[$RANDOM % ${#names[@]}]}"
 }
 
+# Generates random email address given a random name
 generate_random_email() {
     local name=$(generate_random_name | tr '[:upper:]' '[:lower:]')
     local domains=("gmail.com" "yahoo.com" "outlook.com" "example.com")
@@ -20,9 +22,10 @@ generate_random_email() {
     echo "${name}${RANDOM:0:2}@${domain}"
 }
 
+# List of content to post
 generate_random_content() {
     local actions=("Updated portfolio" "Fixed a bug" "Deployed new feature" "Initialized database" "Pushed new commit")
-    echo "${actions[$RANDOM % ${#actions[@]}]} - ID: ${RANDOM}"
+    echo "${actions[$RANDOM % ${#actions[@]}]}"
 }
 
 # This will generate a random date within the last year
@@ -31,7 +34,7 @@ generate_random_date() {
     date -d "${random_days_ago} days ago" "+%a, %d %B %Y %H:%M:%S PST"
 }
 
-
+# Uses the above functions and sends a POST request
 make_post_request() {
     local name=$(generate_random_name)
     local email=$(generate_random_email)
@@ -57,6 +60,8 @@ make_post_request() {
     echo -e "\n"
 }
 
+# OUTDATED: NO LONGER USING ID AS PATH PARAMETER
+# Queries db for latest id and deletes that entry/row
 make_delete_request() {
     local table=$(mariadb -u $USER -p$PASSWORD -D $DATABASE -e 'SHOW TABLES;' | tail -n +2)
     local max_id=$(mariadb -u $USER -p$PASSWORD -D $DATABASE -e "SELECT id FROM $table WHERE id=(SELECT MAX(id) FROM $table);" | tail -n 1)
@@ -72,7 +77,7 @@ make_delete_request() {
     echo -e "\n"
 }
 
-
+# Returns the whole table
 make_get_request() {
     echo "---------------------------------"
     echo "Sending GET request to ${API_URL}"

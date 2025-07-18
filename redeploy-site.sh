@@ -27,5 +27,6 @@ pip install -r requirements.txt
 deactivate
 
 echo "Restarting myportfolio.service"
+systemctl daemon-reload
 systemctl restart myportfolio
 systemctl status myportfolio
