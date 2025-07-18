@@ -3,7 +3,6 @@ from peewee import *
 
 from app import TimelinePost
 
-<<<<<<< Updated upstream
 # create an in-memory test or dummy database for testing
 test_db = SqliteDatabase(':memory:')
 MODELS = [TimelinePost]
@@ -18,23 +17,10 @@ class TestTimelinePost(unittest.TestCase):
          test_db.create_tables(MODELS)
 
     # run after each test
-=======
-MODELS = [TimelinePost]
-
-test_db = SqliteDatabase(':memory:')
-
-class TestTimelinePost(unittest.TestCase):
-    def setUp(self):
-        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
-        test_db.connect()
-        test_db.create_tables(MODELS)
-
->>>>>>> Stashed changes
     def tearDown(self):
         test_db.drop_tables(MODELS)
         test_db.close()
 
-<<<<<<< Updated upstream
     # test for timeline posts
     def test_timeline_post(self):
         # create two timeline posts to test
@@ -62,18 +48,3 @@ class TestTimelinePost(unittest.TestCase):
         self.assertEqual(second_post.content, 'Hello world, I\'m Jane')
         
         
-=======
-    def test_create_timeline_post(self):
-        first_post = TimelinePost.create(
-            name="John Doe",
-            email="jonnydoe@gmail.com",
-            content="Hi Mom!"
-        )
-        assert first_post.id == 1   # Only really works if db is empty since id is autoincrementing
-        second_post = TimelinePost.create(
-            name="Jane Doe",
-            email="jdoe@gmail.com",
-            content="Hi Dad!"
-        )
-        assert second_post.id == 2 
->>>>>>> Stashed changes
