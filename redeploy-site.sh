@@ -15,8 +15,6 @@ cd "$PROJECT_DIR"
 echo "Fetching latest commit and resetting"
 git fetch origin && git reset origin/main --hard
 
-deactivate
-
 
 echo "Spinning down any currently active docker containers"
 docker compose -f docker-compose.prod.yml down
