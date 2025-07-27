@@ -18,7 +18,7 @@ services:
     env_file:
       - .env
     volumes:
-      - myportfoliodb:/var/lib/mysql
+      - mydatabase:/var/lib/mysql
 
   nginx:
     container_name: nginx
@@ -36,5 +36,5 @@ services:
       - myportfolio
 
 volumes:
-  myportfolio:
+  mydatabase:
   nginx_secrets:
