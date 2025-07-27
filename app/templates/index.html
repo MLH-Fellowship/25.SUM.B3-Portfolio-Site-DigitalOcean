@@ -98,16 +98,27 @@
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status === 429) {
+                        showMessage('Rate limit exceeded. Please wait a moment before posting again.', 'warning');
+                        return;
+                    }
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    // Clear form
-                    form.reset();
-                    
-                    // Show success message
-                    showMessage('Post submitted successfully!', 'success');
-                    
-                    // Reload posts
-                    loadPosts();
+                    if (data) {
+                        // Clear form
+                        form.reset();
+                        
+                        // Show success message
+                        showMessage('Post submitted successfully!', 'success');
+                        
+                        // Reload posts
+                        loadPosts();
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -129,10 +140,21 @@
                     fetch('/api/timeline_post', {
                         method: 'DELETE'
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (response.status === 429) {
+                            showMessage('Rate limit exceeded. Please wait a moment before trying again.', 'warning');
+                            return;
+                        }
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        showMessage('Post deleted successfully!', 'success');
-                        loadPosts();
+                        if (data) {
+                            showMessage('Post deleted successfully!', 'success');
+                            loadPosts();
+                        }
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -148,9 +170,24 @@
             // Function to load posts
             function loadPosts() {
                 fetch('/api/timeline_post')
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status === 429) {
+                        postsContainer.innerHTML = '<div class="rate-limit-message">Rate limit exceeded. Posts will load automatically in a moment...</div>';
+                        // Retry after a delay
+                        setTimeout(() => {
+                            loadPosts();
+                        }, 5000);
+                        return;
+                    }
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    displayPosts(data.timeline_posts);
+                    if (data) {
+                        displayPosts(data.timeline_posts);
+                    }
                 })
                 .catch(error => {
                     console.error('Error loading posts:', error);
@@ -190,8 +227,18 @@
             function showMessage(message, type) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message message-${type}`;
+                
+                let icon;
+                if (type === 'success') {
+                    icon = 'check-circle';
+                } else if (type === 'warning') {
+                    icon = 'clock';
+                } else {
+                    icon = 'exclamation-triangle';
+                }
+                
                 messageDiv.innerHTML = `
-                    <i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                    <i class="fa-solid fa-${icon}"></i>
                     ${message}
                 `;
                 
@@ -200,10 +247,11 @@
                 if (formContainer) {
                     formContainer.insertBefore(messageDiv, formContainer.firstChild);
                     
-                    // Remove message after 5 seconds
+                    // Remove message after longer time for warning messages
+                    const timeout = type === 'warning' ? 8000 : 5000;
                     setTimeout(() => {
                         messageDiv.remove();
-                    }, 5000);
+                    }, timeout);
                 }
             }
             
