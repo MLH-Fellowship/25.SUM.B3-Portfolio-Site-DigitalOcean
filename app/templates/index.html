@@ -390,7 +390,7 @@
                 if (e.state && e.state.route) {
                     const route = e.state.route;
                     //const baseUrl = '{{ url }}';
-                    const url = `${route}`;
+                    const url = `/${route}`;
                     
                     navLinks.forEach(l => l.parentElement.classList.remove('active'));
                     const activeLink = document.querySelector(`[data-route="${route}"]`);
