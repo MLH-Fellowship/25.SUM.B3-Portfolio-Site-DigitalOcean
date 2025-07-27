@@ -39,12 +39,12 @@
             <div class="nav-bar">
                 <nav id="nav">
                     <ul>
-                        <li class="nav-element"><a href="{{ url }}/about" data-route="about"><i class="fa-solid fa-person"></i> About</a></li>
-                        <li class="nav-element"><a href="{{ url }}/experience" data-route="experience"><i class="fa-solid fa-suitcase"></i> Experience</a></li>
-                        <li class="nav-element"><a href="{{ url }}/education" data-route="education"><i class="fa-solid fa-graduation-cap"></i> Education</a></li>
-                        <li class="nav-element"><a href="{{ url }}/hobbies" data-route="hobbies"><i class="fa-solid fa-heart"></i> Hobbies</a></li>
-                        <li class="nav-element"><a href="{{ url }}/travel" data-route="travel"><i class="fa-solid fa-location-dot"></i> Travel</a></li>
-                        <li class="nav-element"><a href="{{ url }}/timeline" data-route="timeline"><i class="fa-solid fa-clock"></i> Timeline</a></li>
+                        <li class="nav-element"><a href="/about" data-route="about"><i class="fa-solid fa-person"></i> About</a></li>
+                        <li class="nav-element"><a href="/experience" data-route="experience"><i class="fa-solid fa-suitcase"></i> Experience</a></li>
+                        <li class="nav-element"><a href="/education" data-route="education"><i class="fa-solid fa-graduation-cap"></i> Education</a></li>
+                        <li class="nav-element"><a href="/hobbies" data-route="hobbies"><i class="fa-solid fa-heart"></i> Hobbies</a></li>
+                        <li class="nav-element"><a href="/travel" data-route="travel"><i class="fa-solid fa-location-dot"></i> Travel</a></li>
+                        <li class="nav-element"><a href="/timeline" data-route="timeline"><i class="fa-solid fa-clock"></i> Timeline</a></li>
                     </ul>
                 </nav>
             </div>
@@ -346,8 +346,8 @@
                     e.preventDefault(); 
                     
                     const route = this.getAttribute('data-route');
-                    const baseUrl = '{{ url }}';
-                    const url = baseUrl.startsWith('http') ? `${baseUrl}/${route}` : `http://${baseUrl}/${route}`;
+                    //const baseUrl = '{{ url }}';
+                    const url = `/${route}`;
                     
                     navLinks.forEach(l => l.parentElement.classList.remove('active'));
                     this.parentElement.classList.add('active');
@@ -389,8 +389,8 @@
             window.addEventListener('popstate', function(e) {
                 if (e.state && e.state.route) {
                     const route = e.state.route;
-                    const baseUrl = '{{ url }}';
-                    const url = baseUrl.startsWith('http') ? `${baseUrl}/${route}` : `http://${baseUrl}/${route}`;
+                    //const baseUrl = '{{ url }}';
+                    const url = `${route}`;
                     
                     navLinks.forEach(l => l.parentElement.classList.remove('active'));
                     const activeLink = document.querySelector(`[data-route="${route}"]`);
