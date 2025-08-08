@@ -29,3 +29,6 @@ jobs:
       
       - name: Deploy Site
         run: ssh my-droplet '~/redeploy-site.sh'
+      
+      - name: Discord Webhook
+        run: curl -s -X POST "${{ secrets.DISCORD_WEBHOOK }}" -d "content=🚀 Deployment Successful"
