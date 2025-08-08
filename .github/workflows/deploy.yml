@@ -27,5 +27,5 @@ jobs:
           SSH_IP: ${{ secrets.SSH_IP }}
           SSH_USER: ${{ secrets.SSH_USER }}
       
-      - name: Print root dir
-        run: ssh my-droplet 'cd ${{ secrets.PROJECT_ROOT }} && pwd'
+      - name: Deploy Site
+        run: ssh my-droplet '~/redeploy-site.sh'
